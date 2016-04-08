@@ -1,0 +1,9 @@
+{
+	"name": "express_survey",
+	"description": "A simple survey form implementation in Express",
+	"dependencies": {
+		"body-parser": "^1.15.0",
+		"ejs": "^2.3.3",
+		"express": "^4.13.3"
+	}
+}
