@@ -7,15 +7,43 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<!-- jQuery -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<script type ="text/javascript" src="/socket.io/socket.io.js"></script>
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="styles.css">
+	<script>
+		$(document).ready(function() {
+			$('#message').hide();
+			var socket = io.connect();
+			$('#survey-form').submit(function() {
+				var forminputs = $('#survey-form :input');
+				var values = {};
+				$.each($('#survey-form').serializeArray(), function(i, field) {
+					values[field.name] = field.value;
+				});
+				console.log(values);
+				socket.emit("posting_form", { info: values });
+
+				return false;
+			});
+
+			socket.on("updated_message", function(data) {
+				$('#message').show();
+				$('#message').html("<p>You emitted the following information to the server: { name: '" + data.surveydata.name + "', location: '" + data.surveydata.location + "', language: '" + data.surveydata.language + "', comment: '" + data.surveydata.comment + "' }</p>");
+			});
+
+			socket.on("lucky_number", function(data) {
+				$('#message').append("<p>Your lucky number emitted by the server is: " + data.lucky + "</p>");
+			});
+		})
+	</script>
 </head>
 <body>
 	<div class="container">
 		<div class="row">
 			<div class="col-xs-12">
-				<form action="/result" method="post">
+				<div id="message"></div>
+				<form action="/result" method="post" id="survey-form">
 					<div class="form-group">
 						<label>Your Name:</label>
 						<input type="text" class="form-control" name="name">
